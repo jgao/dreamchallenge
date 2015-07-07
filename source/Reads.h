@@ -34,6 +34,7 @@ extern int BATCH_SIZE;  // Batch size in reads.
 struct read {
     char* seqName1;
     unsigned long long int* sequence;
+    unsigned long long int* sequence_reverse_comp;
     char* seqName2;
     char* quality;   
     

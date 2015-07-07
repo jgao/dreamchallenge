@@ -34,6 +34,9 @@ extern "C" {
 // Encodes the given string into the sequence_64b 64bit word array
 void encode_sequence(struct read* rd, char* seq);
 
+// Encodes the given string's reverse complement into the sequence_64b 64bit word array
+void encode_sequence_reverse_comp(struct read* rd, char* seq);
+
 #ifdef	__cplusplus
 }
 #endif

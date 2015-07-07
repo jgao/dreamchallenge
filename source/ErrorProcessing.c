@@ -51,7 +51,7 @@ static inline void printProgress(int x, int n, int r)
     printf("%d%% ", (int)result);
     fflush(stdout);
 }
-
+/*
 void hashSequence(unsigned long long int* sequence, unsigned int sequenceLength,
         KMerHashTable* kmers, unsigned int kmerSize)
 {
@@ -89,7 +89,7 @@ void hashReads(Correction* correction)
         
         // Iterate over all reads:
         for(int i = 0; readsHasNext(reads[file]); i++)
-        {            
+        {
             printProgress(i, readsGetCount(reads[file]), 20);
             
             current = readsGetNext(reads[file]);  
@@ -100,12 +100,47 @@ void hashReads(Correction* correction)
         }
         
         printf("\n");
-        
+
         printf("Preprocessing k-mers...\n");
         preprocessKMers(kmers, correction);
         printf("Finished preprocessing k-mers!\n\n");
     }
-}
+
+    /*printf("JACK'S EDITS\n");
+
+    unsigned int max = getMaxKMerCount(kmers);
+    printf("pollux max: %llu\n", max);
+    unsigned int* dist = createDistribution(kmers, max);
+
+    FILE* dump_file;
+    dump_file = fopen("pollux_kmer_dist", "w");
+    printf("%d\n", max);
+    for(int i = 0; i <= max; i++) {
+        fprintf(dump_file, "%d %d %d\n", i, dist[i], dist[i]/2);
+    }
+
+    fclose(dump_file);
+    free(dist);
+
+    printf("done with original, now on to jellyfish\n");
+
+    max = getMaxJellyfishKMerCount(jellyfishKMers);
+    printf("jellyfish max: %llu\n", max);
+    dist = createJellyfishDistribution(jellyfishKMers, max);
+
+    dump_file = fopen("pollux_jellyfish_kmer_dist", "w");
+    printf("%d\n", max);
+    for(int i = 0; i <= max; i++) {
+        fprintf(dump_file, "%d %d\n", i, dist[i]);
+    }
+
+    fclose(dump_file);
+    free(dist);
+
+    //freeJellyfishKMerHashTable(jellyfishKMers);
+
+    printf("END JACK'S EDITS\n");*/
+//}
 
 void executePairedCorrection(Correction* correction,
         FILE* leftCorrectedFile, FILE* rightCorrectedFile, 
@@ -395,7 +430,7 @@ void processPairedCorrection(Correction* correction)
         fclose(rightGarbageFile);
     }
     
-    fclose(extraFile);    
+    fclose(extraFile);
 }
 
 Correction* preprocessing(int numInputFiles, char* inputFileNames, char* outputDirectory) 
@@ -403,7 +438,8 @@ Correction* preprocessing(int numInputFiles, char* inputFileNames, char* outputD
     unsigned int LOW_COVERAGE_THRESHOLD_DEFAULT = 3;
 
     // Data Structures:
-    KMerHashTable* kmers = newKMerHashTable();
+    // TODO: make file inputs available at command line
+    KMerHashTable* kmers = newKMerHashTable("mer_dump");
     Reads** reads = (Reads**)malloc(sizeof(Reads*) * numInputFiles);
     Correction* correction = (Correction*)malloc(sizeof(Correction));
     
@@ -422,12 +458,16 @@ Correction* preprocessing(int numInputFiles, char* inputFileNames, char* outputD
     correction = createCorrection(reads, numInputFiles, 
             kmers, KMER_SIZE, LOW_COVERAGE_THRESHOLD_DEFAULT,
             outputDirectory, NULL);
-    
+
+    correction->lowKMerThreshold = getlowKMerThreshold(kmers);
+    printf("Low k-mer count value was observed to be %d.\n", correction->lowKMerThreshold);
+
     // CONSTRUCT KMERS:
+/*
     printf("Constructing k-mers...\n");       
     hashReads(correction);
     printf("Finished constructing k-mers!\n\n");
-    
+*/
     return correction;
 }
 

@@ -108,8 +108,110 @@ void help()
     printf("\n");    
 }
 
+// ripped off of the one in KMerHashTable
+unsigned long long int kmerAlphaToNumeric(char* kmer_alpha, int length)
+{
+    unsigned long long int result = 0x0;
+    
+    for (int i = 0; i < length; i++) {
+        result = (result | nucleotideAlphaToNumeric(kmer_alpha[i])) << 2;
+    }
+
+    return result;
+}
+
+void generate(char* source_filename, char* output_filename, KMerHashTable* origKMers, KMerHashTable* mutaKMers, KMerHashTable* refnKMers) {
+
+    const int KMER_LEN = 31;
+
+    FILE* source_file = fopen(source_filename, "r");
+    FILE* output_file = fopen(output_filename, "w");
+
+
+    char count_line[500];
+    char sequence_alpha[500];
+    int ccc = 0;
+
+    while (fgets(count_line, 500, source_file) != NULL
+        && fgets(sequence_alpha, 500, source_file) != NULL) {
+        
+        trimSpaces(count_line);
+        deleteCharacter(count_line, 0);
+
+        trimSpaces(sequence_alpha);
+
+        char kmer[KMER_LEN + 1];
+
+        unsigned long long int* origCounts = (unsigned long long int*)malloc(sizeof(unsigned long long int) * strlen(sequence_alpha) - KMER_LEN + 1);
+        unsigned long long int* mutaCounts = (unsigned long long int*)malloc(sizeof(unsigned long long int) * strlen(sequence_alpha) - KMER_LEN + 1);
+        unsigned long long int* refnCounts = (unsigned long long int*)malloc(sizeof(unsigned long long int) * strlen(sequence_alpha) - KMER_LEN + 1);
+
+        for (int i = 0; i <= strlen(sequence_alpha) - KMER_LEN; i++) {
+            memcpy(kmer, &sequence_alpha[i], KMER_LEN);
+            kmer[KMER_LEN] = '\0';
+
+            unsigned long long int kmer_num = kmerAlphaToNumeric(kmer, KMER_LEN);
+
+            unsigned long long int origCount = KMerTableLookup(origKMers, kmer_num);
+            unsigned long long int mutaCount = KMerTableLookup(mutaKMers, kmer_num);
+            unsigned long long int refnCount = KMerTableLookup(refnKMers, kmer_num);
+
+            origCounts[i] = origCount;
+            mutaCounts[i] = mutaCount;
+            refnCounts[i] = refnCount;
+        }
+
+        fprintf(output_file, "%s\n", sequence_alpha);
+        for (int i = 0; i <= strlen(sequence_alpha) - KMER_LEN; i++) {
+            fprintf(output_file, "%llu ", origCounts[i]);
+        }
+        fprintf(output_file, "\n");
+        for (int i = 0; i <= strlen(sequence_alpha) - KMER_LEN; i++) {
+            fprintf(output_file, "%llu ", mutaCounts[i]);
+        }
+        fprintf(output_file, "\n");
+        for (int i = 0; i <= strlen(sequence_alpha) - KMER_LEN; i++) {
+            fprintf(output_file, "%llu ", refnCounts[i]);
+        }
+        fprintf(output_file, "\n");
+
+
+
+        free(origCounts);
+        free(mutaCounts);
+        free(refnCounts);
+
+
+        // short iterations for testing
+        //if (ccc++ == 100) break;
+
+        //printf("DONE%d", ccc);
+    }
+
+    fclose(source_file);
+    fclose(output_file);
+}
+
 int main(int argc, char**argv) 
 {
+    KMerHashTable* origKMers = newKMerHashTable("/mnt/bulk_storage/jackgao/0/mer_dump");
+    printf("Done generating original tables");
+
+    KMerHashTable* mutaKMers = newKMerHashTable("/mnt/bulk_storage/jackgao/1/mer_dump");
+    printf("Done generating mutation tables");
+
+    KMerHashTable* refnKMers = newKMerHashTable("/mnt/bulk_storage/jshlorv/DREAMproject/hg19_dump");
+    printf("Done generating reference tables");
+
+    generate("/mnt/extra_storage/jshlorv/DREAMproject/snp_map.b2.fa", "/mnt/extra_storage/jshlorv/DREAMproject/snp_map.b2.fa.counted", origKMers, mutaKMers, refnKMers);
+    generate("/mnt/extra_storage/jshlorv/DREAMproject/dup_map.b5.fa", "/mnt/extra_storage/jshlorv/DREAMproject/dup_map.b5.fa.counted", origKMers, mutaKMers, refnKMers);
+
+    free(origKMers);
+    free(mutaKMers);
+    free(refnKMers);
+
+    return 0;
+
     char outputDirectory[1024];
     enum SEQUENCING_TECHNOLOGY type = UNKNOWN;
     

@@ -19,10 +19,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "Globals.h"
-#include "hash-table.h"
 
-#ifndef KMERHASHTABLE_H
-#define	KMERHASHTABLE_H
+#ifndef JELLYFISHKMERHASHTABLE_H
+#define	JELLYFISHKMERHASHTABLE_H
 
 #ifdef	__cplusplus
 extern "C" {
@@ -39,14 +38,24 @@ typedef struct
     unsigned long long int num_kmer;
     unsigned int num_possible_ki;
 
-} KMerHashTable;
+} JellyfishKMerHashTable;
 
 /**
- * Creates a new KMerHashTable.
+ * Creates a new JellyfishKMerHashTable.
  * 
  * @return 
  */
-KMerHashTable* newKMerHashTable(char* jellyfishFile);
+JellyfishKMerHashTable* newJellyfishKMerHashTable(char* filename);
+
+/**
+ * Insters count at the location associated with kmer. 
+ * 
+ * @param kmerTable The kmer table to work with.
+ * @param kmer The kmer value.
+ * @param count The count value to store.
+ * @return Whether or not the insert was successful.
+ */
+// int KMerTableInsert(KMerHashTable* kmerTable, unsigned long long int kmer, unsigned long long int count);
 
 /**
  * Does a lookup and returns the count value stored at the location associated 
@@ -56,7 +65,10 @@ KMerHashTable* newKMerHashTable(char* jellyfishFile);
  * @param kmer The kmer value.
  * @return The count associated with the kmer.
  */
-unsigned long long int KMerTableLookup(KMerHashTable* kmerTable, unsigned long long int kmer);
+unsigned long long int JellyfishKMerTableLookup(JellyfishKMerHashTable* jellyfishKMerTable, unsigned long long int kmer);
+
+// void addKMersToTable(KMerHashTable* table, unsigned long long int* sequence, 
+//         unsigned int sequenceLength, unsigned int kmerSize);
 
 /**
  * This function returns the maximum k-mer count for the k-mer hash table.
@@ -72,7 +84,7 @@ unsigned long long int KMerTableLookup(KMerHashTable* kmerTable, unsigned long l
  * @param kmerTable The k-mer table to work with.
  * @return The maximum k-mer counts.
  */
-unsigned int getMaxKMerCount(KMerHashTable* kmerTable);
+unsigned int getMaxJellyfishKMerCount(JellyfishKMerHashTable* jellyfishKMerTable);
 
 /**
  * Creates a distribution of k-mer counts, such that the indices correspond to 
@@ -91,11 +103,19 @@ unsigned int getMaxKMerCount(KMerHashTable* kmerTable);
  * @param max The maximum k-mer counts.
  * @return The k-mer count distribution.
  */
-unsigned int* createDistribution(KMerHashTable* kmerTable, unsigned int max);
+unsigned int* createJellyfishDistribution(JellyfishKMerHashTable* jellyfishKMerTable, unsigned int max);
 
-unsigned int getlowKMerThreshold(KMerHashTable* kmerTable);
+/**
+ * This function determines the number of repeats k-mers in the k-mer hash table.
+ * 
+ * @param kmerTable The k-mer table to work with.
+ * @return The number of repeats.
+ */
+//unsigned int getNumRepeats(KMerHashTable* kmerTable);
 
-void freeKMerHashTable(KMerHashTable* kmerTable);
+//void preprocessKMers(KMerHashTable* kmerTable, Correction* correction);
+
+void freeJellyfishKMerHashTable(JellyfishKMerHashTable* kmerTable);
 
 #ifdef	__cplusplus
 }

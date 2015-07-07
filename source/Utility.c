@@ -126,6 +126,92 @@ unsigned long long int* createReverseCompliment(unsigned long long int* sequence
     return reverseCompliment;
 }
 
+unsigned int nucleotideAlphaToNumeric(char nucleotide) {
+    if (nucleotide == 'A') return 0x0;
+    if (nucleotide == 'G') return 0x1;
+    if (nucleotide == 'C') return 0x2;
+    if (nucleotide == 'T') return 0x3;
+
+    printf("error: could not match nucleotide %c\n", nucleotide);
+    return 0x0;
+}
+
+void deleteCharacter(char* string, int pos)
+{
+    int length = strlen(string);
+    
+    if (pos < 0 || pos >= length)
+        return;
+    
+    for(int i = pos; i < length; i++)
+    {
+        string[i] = string[i + 1];
+    }
+    
+    string[length] = '\0';
+}
+
+
+void trimSpaces(char* string)
+{
+    // Delete leading spaces.
+    while(strlen(string) >= 1 && isspace(string[0]))
+    {
+        deleteCharacter(string, 0);
+    }
+    
+    // Delete trailing N's.
+    while(strlen(string) >= 1 && isspace(string[strlen(string) - 1]))
+    {
+        deleteCharacter(string, strlen(string) - 1);
+    }
+}
+
+void printBinary(unsigned long long int n){
+
+    int i = 0;
+
+    while (i<64) {
+        if (n & 1)
+            printf("1");
+        else
+            printf("0");
+
+        if (i%4 == 3) printf(" ");
+
+        n >>= 1;
+        i++;
+    }
+    printf("\n");
+
+}
+
+// from http://www8.cs.umu.se/~isak/snippets/strrev.c
+char* strrev(char* str)
+{
+      char *p1, *p2;
+
+      if (! str || ! *str)
+            return str;
+      for (p1 = str, p2 = str + strlen(str) - 1; p2 > p1; ++p1, --p2)
+      {
+            *p1 ^= *p2;
+            *p2 ^= *p1;
+            *p1 ^= *p2;
+      }
+      return str;
+}
+
+unsigned long long int createReverseComplimentKMer(unsigned long long int kmer)
+{
+    unsigned long long int reverse;
+    unsigned long long int reverseCompliment;
+
+    reverse = getReverse(kmer);
+    reverseCompliment = ~(reverse);
+    return reverseCompliment << 2;
+}
+
 void printAsNucleotides(unsigned long long int* sequence, 
         unsigned int startNucleotidePosition, 
         unsigned int endNucleotidePosition)

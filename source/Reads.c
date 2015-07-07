@@ -103,6 +103,7 @@ void freeReads(Reads* reads)
             
             free(current->seqName1);
             free(current->sequence);
+            free(current->sequence_reverse_comp);
             free(current->seqName2);
             free(current->quality);
             
@@ -150,21 +151,6 @@ void replaceN(char* string)
     }
 }
 
-void deleteCharacter(char* string, int pos)
-{
-    int length = strlen(string);
-    
-    if (pos < 0 || pos >= length)
-        return;
-    
-    for(int i = pos; i < length; i++)
-    {
-        string[i] = string[i + 1];
-    }
-    
-    string[length] = '\0';
-}
-
 void trimNs(char* sequence, char* quality)
 {
     // Delete leading N's.
@@ -182,21 +168,6 @@ void trimNs(char* sequence, char* quality)
         deleteCharacter(sequence, strlen(sequence) - 1);
         deleteCharacter(quality, strlen(quality) - 1);
     }    
-}
-
-void trimSpaces(char* string)
-{
-    // Delete leading spaces.
-    while(strlen(string) >= 1 && isspace(string[0]))
-    {
-        deleteCharacter(string, 0);
-    }
-    
-    // Delete trailing N's.
-    while(strlen(string) >= 1 && isspace(string[strlen(string) - 1]))
-    {
-        deleteCharacter(string, strlen(string) - 1);
-    }
 }
 
 void loadReads(Reads* reads)
@@ -238,6 +209,9 @@ void loadReads(Reads* reads)
         
         // Encode sequences:
         encode_sequence(current, sequence);
+
+        // Also encode reverse_complement of sequences
+        //encode_sequence_reverse_comp(current, sequence);
         
          // Sequence name 2:
         current->seqName2 = malloc(strlen(seqName2) + 1);

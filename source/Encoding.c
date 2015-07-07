@@ -42,9 +42,29 @@ unsigned int encode_Nucleotide(char n1) {
     }    
 }
 
+// copied from encode_Nucleotide, but with the return values appropriately swapped.
+unsigned int encode_Nucleotide_reverse_comp(char n1) {
+    if (n1 == 'A' || n1 == 'a') { // swapped with T
+        return 3;
+    } else if (n1 == 'G' || n1 == 'g') { // swapped with C
+        return 2;
+    } else if (n1 == 'C' || n1 == 'c') { // swapped with G
+        return 1;
+    } else if (n1 == 'T' || n1 == 't') { // swapped with A
+        return 0;
+    } else { // used for filling
+        return 0;
+    }    
+}
+
 void fill_int(unsigned long long int *nucl_seq, char n1) {
     *nucl_seq <<= 2;
     *nucl_seq += encode_Nucleotide(n1);
+}
+
+void fill_int_reverse_comp(unsigned long long int *nucl_seq, char n1) {
+    *nucl_seq <<= 2;
+    *nucl_seq += encode_Nucleotide_reverse_comp(n1);
 }
 
 void encode_sequence(struct read* rd, char* seq) {
@@ -69,5 +89,34 @@ void encode_sequence(struct read* rd, char* seq) {
     // pad the rest with 0's
     for (int i = rd->length; i < (seq_words*32); i++) {
         fill_int(&rd->sequence[i / 32], 'X');
+    }
+}
+
+// first reverse, then swap out all nucleotide with their complements
+void encode_sequence_reverse_comp(struct read* rd, char* seq){
+    // first reverse
+    strrev(seq);
+
+    if (strchr(seq, '\n')) {
+        seq[strlen(seq) - 1] = 0;
+    }
+    int seq_words = ceil((double)strlen(seq)/(double)32);
+    rd->sequence_reverse_comp = malloc(seq_words * sizeof(unsigned long long int));
+    // initialize the array to be 0's
+    for (int i = 0; i < seq_words; i++) {
+        rd->sequence_reverse_comp[i] = 0;
+    }
+
+    rd->length = strlen(seq);
+
+    
+    // for each character in the sequence, encode it
+    for (int i = 0; i < rd->length; i++) {
+        fill_int_reverse_comp(&rd->sequence_reverse_comp[i / 32], seq[i]);
+    }
+
+    // pad the rest with 0's
+    for (int i = rd->length; i < (seq_words*32); i++) {
+        fill_int_reverse_comp(&rd->sequence_reverse_comp[i / 32], 'X');
     }
 }

@@ -145,6 +145,15 @@ unsigned long long int getReverse(unsigned long long int sequence);
 unsigned long long int* createReverseCompliment(unsigned long long int* sequence,
         unsigned int length);
 
+unsigned long long int createReverseComplimentKMer(unsigned long long int kmer);
+
+unsigned int nucleotideAlphaToNumeric(char nucleotide);
+
+void deleteCharacter(char* string, int pos);
+void trimSpaces(char* string);
+void printBinary(unsigned long long int n);
+char* strrev(char* str);
+
 char getBase(unsigned long long int* nucleotideSequence, 
         unsigned int nucleotidePosition);
 
