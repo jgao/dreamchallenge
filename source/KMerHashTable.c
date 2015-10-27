@@ -291,6 +291,69 @@ unsigned long long int KMerTableLookupSingleDirection(KMerHashTable* kmerTable, 
     }
     
     return count;
+
+
+
+
+
+
+
+
+
+    // KR binary search impelementation
+    
+    const int BINARY_LINEAR_BREAKEVEN_SIZE = 32;
+
+    unsigned int ki = getKI(kmer);
+    unsigned int kr = getKR(kmer);
+
+    unsigned long long int kr_list_start_pos = kmerTable->ki_index[ki];
+    int count = 0;
+    int iter_count = 0;
+
+    uint32_t num_total = kmerTable->num_kr_per_ki[ki];
+
+    if (num_total < BINARY_LINEAR_BREAKEVEN_SIZE) {
+        // if data is small, then linear search...
+        for (unsigned int i = 0; i < num_total; i++) {
+            iter_count++;
+            if (kmerTable->kr_list[kr_list_start_pos + i] == kr) {
+                count = kmerTable->kmer_frequency[kr_list_start_pos + i];
+                break;
+            }
+        }
+    } else {
+        // ...if data is big, then binary search
+        uint32_t start = kr_list_start_pos;
+        uint32_t end = kr_list_start_pos + num_total - 1;
+
+        while (start <= end) {
+            uint32_t mid = ((end - start) / 2) + start;
+            iter_count++;
+            if (kmerTable->kr_list[kr_list_start_pos + mid] == kr) {
+                count = kmerTable->kmer_frequency[kr_list_start_pos + mid];
+                break;
+            } else if (kmerTable->kr_list[kr_list_start_pos + mid] > kr) {
+                end = mid - 1;
+            } else {
+                start = mid + 1;
+            }
+        }
+    }
+
+    // because we discard unique kmers, we (optimistically) assume that uncatalogued kmers have a count of 1
+    if(count == 0)
+    {
+        count = 1;
+    }
+
+    return count;
+
+
+
+
+
+
 }
 
 unsigned long long int KMerTableLookup(KMerHashTable* kmerTable, unsigned long long int kmer)
