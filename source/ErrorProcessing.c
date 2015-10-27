@@ -451,7 +451,7 @@ Correction* preprocessing(int numInputFiles, char* inputFileNames, char* outputD
         printf("Reading file: %s\n", inputFileName);
         
         reads[i] = createReads(inputFileName);
-    }    
+    }
     printf("Finished creating read objects!\n\n");    
 
     // META OBJECT:

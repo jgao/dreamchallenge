@@ -103,6 +103,17 @@ unsigned int getlowKMerThreshold(KMerHashTable* kmerTable) {
 
 KMerHashTable* newKMerHashTable(char* jellyfishFile)
 {
+    // only need to save half
+    uint32_t sizeof_revcomp_dict = 0xFFFFFFFF;
+    uint32_t* revcomp_dict = (uint32_t*)malloc(sizeof(uint32_t) * sizeof_revcomp_dict);
+    
+    for (uint32_t i = 0; i < sizeof_revcomp_dict; i++) {
+        revcomp_dict[i] = ~getReverse16(i);
+    }
+
+
+
+
 printf("START OF BUILDING JELLYFISH HASHTABLE\n");
     KMerHashTable* table = (KMerHashTable*)malloc(sizeof(KMerHashTable));
  
@@ -124,6 +135,7 @@ printf("START OF BUILDING JELLYFISH HASHTABLE\n");
     char count_line[KMER_LENGTH + 10];
     char kmer_alpha[KMER_LENGTH + 10];
 
+int iter=0;
     while (fgets(count_line, KMER_LENGTH + 10, jellyfish_file) != NULL
         && fgets(kmer_alpha, KMER_LENGTH + 10, jellyfish_file) != NULL) {
         
@@ -135,7 +147,7 @@ printf("START OF BUILDING JELLYFISH HASHTABLE\n");
         int kmer_count = (int)strtod(count_line, NULL);
 
         // ignore all kmers appearing once
-        if (kmer_count == 1) continue;
+    //if (kmer_count == 1) continue;
 
         unsigned long long int kmer_numeric = getKMerNumeric(kmer_alpha);
 //unsigned long long int reverse_comp = createReverseComplimentKMer(kmer_numeric);
@@ -145,7 +157,31 @@ printf("START OF BUILDING JELLYFISH HASHTABLE\n");
 
         table->ki_index[ki]++;
 //table->ki_index[rcki]++;
+
+        /*printBinary(kmer_numeric);
+        printf("%d / %d\n", (0xFFFFFFFF00000000 & kmer_numeric) >> 32, sizeof_revcomp_dict);
+        printBinary(revcomp_dict[(0xFFFFFFFF00000000 & kmer_numeric) >> 32]);
+        printf("%d / %d\n", 0x00000000FFFFFFFF & kmer_numeric, sizeof_revcomp_dict);
+        printBinary(revcomp_dict[0x00000000FFFFFFFF & kmer_numeric]);
+*/
+        unsigned long long int rc_hi = revcomp_dict[(0xFFFFFFFF00000000 & kmer_numeric) >> 32];
+        unsigned long long int rc_lo = revcomp_dict[0x00000000FFFFFFFF & kmer_numeric];
+
+        printBinary((rc_hi << 2));
+        printBinary((rc_lo << 34));
+
+        unsigned long long int rc = (rc_hi << 2) | (rc_lo << 34);
+
+        printBinary(rc);
+        printBinary(createReverseComplimentKMer(kmer_numeric));
+        //printBinary(getKMerNumeric("TAAATTGACCATCAACCGCACCCGACATCAC"));
+        printf("\n");
+
+
+
+        if (iter++ >= 4) break;
     }
+exit(0);
 
     fclose(jellyfish_file);
 printf("DONE FIRST PASS\n");

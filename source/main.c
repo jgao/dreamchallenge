@@ -193,7 +193,7 @@ void generate(char* source_filename, char* output_filename, KMerHashTable* origK
 }
 
 int main(int argc, char**argv) 
-{
+{/*
     KMerHashTable* origKMers = newKMerHashTable("/mnt/bulk_storage/jackgao/0/mer_dump");
     printf("Done generating original tables");
 
@@ -211,7 +211,7 @@ int main(int argc, char**argv)
     free(refnKMers);
 
     return 0;
-
+*/
     char outputDirectory[1024];
     enum SEQUENCING_TECHNOLOGY type = UNKNOWN;
     

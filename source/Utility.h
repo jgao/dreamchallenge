@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <stdio.h>
+#include <stdint.h>
 
 #ifndef UTILITY_H
 #define	UTILITY_H
@@ -132,7 +133,7 @@ int getMin(int value1, int value2);
  * @return The VALUE of the reverse.
  */
 unsigned long long int getReverse(unsigned long long int sequence);
-
+unsigned long long int getReverse16(uint32_t sequence);
 /**
  * This function returns the reverse compliment for the passed sequence. This 
  * function will allocate memory. The original sequence will be unchanged. The 

@@ -91,6 +91,26 @@ unsigned long long int getReverse(unsigned long long int sequence)
     return reverse;
 }
 
+unsigned long long int getReverse16(uint32_t sequence)
+{
+    unsigned long long int MASK = 0x3;
+    
+    unsigned long long int nucleotide;
+    unsigned long long int reverse = 0x0;
+
+    
+    for(int i = 0; i < 16; i++)
+    {
+        // Get the last nucleotide:
+        nucleotide = (sequence >> (i * 2)) & MASK;        
+                
+        // Add the nucleotide to the reverse:
+        reverse = reverse | (nucleotide << ((16 - i - 1) * 2));
+    }  
+    
+    return reverse;
+}
+
 unsigned long long int* createReverseCompliment(unsigned long long int* sequence,
         unsigned int length)
 {
